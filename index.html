@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+
+<HTML>
+<HEAD>
+<meta charset="utf-8"/>
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+
+<title>metreex.org - Treebank Metric System</title>
+<link rel='shortcut icon' href='js/img/metreex_logo_256_alpha.png' />
+<link rel="icon" href="js/img/metreex_logo_256_alpha.png" /> 
+<link rel="stylesheet" type="text/css" href="style.css">
+
+<script type="text/javascript" src="https://research.dwi.ufl.edu/op.n/js/opn.js"></script>
+<script type="text/javascript" src="https://metreex.org/js/metreex-1.1.js"></script>
+<script type="text/javascript">
+
+
+
+function my_processing(t)
+{
+
+
+
+
+
+	/*for(var i=0;i<t.treebank.length;i++)
+	{
+		output.println(t.treebank[i].getTitle()+' sentences:'+t.treebank[i].getNumOfSentences()+' words:'+t.treebank[i].getNumOfWords());
+		for(var j=0;j<t.treebank[i].getNumOfSentences();j++)
+		{
+			output.println(' Sentence '+(j+1)+' has '+t.treebank[i].getSentence(j).getNumOfWords()+' words.');
+			output.println(t.treebank[i].getSentence(j).toString(NO_PUNCTUATION));
+		}
+	}*/
+
+	var metrics=new Array();
+	var m=null;
+	
+	m=new NodeMetric('Number of nodes');
+	m.setDefaultWeights(NodeMetric.ROOT_ONE_OTHERS_ZERO);
+	m.metric=function(n)
+	{
+		return n.getNumOfNodes();
+	};
+	metrics.push(m);
+	
+	m=new NodeMetric('Number of words');
+	m.setDefaultWeights(NodeMetric.ROOT_ONE_OTHERS_ZERO);
+	m.metric=function(n)
+	{
+		return n.getNumOfWords();
+	};
+	metrics.push(m);
+	
+	m=new NodeMetric('Number of root children');
+	m.setDefaultWeights(NodeMetric.ROOT_ONE_OTHERS_ZERO);
+	m.metric=function(n)
+	{
+		return n.getNumOfChildren();
+	};
+	metrics.push(m);
+	
+	m=new NodeMetric('Number of root grand-children');
+	m.setDefaultWeights(NodeMetric.ROOT_ONE_OTHERS_ZERO);
+	m.metric=function(n)
+	{
+		return n.getNumOfChildren(1);
+	};
+	metrics.push(m);
+	
+	m=new NodeMetric('Number of root great-grand-children');
+	m.setDefaultWeights(NodeMetric.ROOT_ONE_OTHERS_ZERO);
+	m.metric=function(n)
+	{
+		return n.getNumOfChildren(2);
+	};
+	metrics.push(m);
+	
+	m=new NodeMetric('Height');
+	m.setDefaultWeights(NodeMetric.ROOT_ONE_OTHERS_ZERO);
+	m.metric=function(n)
+	{
+		return n.getHeight();
+	};
+	metrics.push(m);
+	
+	m=new NodeMetric('Width');
+	m.setDefaultWeights(NodeMetric.ROOT_ONE_OTHERS_ZERO);
+	m.metric=function(n)
+	{
+		return n.getWidth();
+	};
+	metrics.push(m);
+	
+	m=new NodeMetric('Max Family Width');
+	m.setDefaultWeights(NodeMetric.ROOT_ONE_OTHERS_ZERO);
+	m.metric=function(n)
+	{
+		return n.getMaxFamilyWidth();
+	};
+	metrics.push(m);
+	
+	//----------------------------------------
+	metrics=new Array();
+	
+	m=new NodeMetric('Number of nodes');
+	//m.setDefaultWeights(NodeMetric.ALL_ONE);
+	m.weight=function(n)
+	{
+		return 1;
+	};
+	m.metric=function(n)
+	{
+		return 1;
+	};
+	metrics.push(m);
+	
+	m=new NodeMetric('Percentage of Leaves');
+	m.setDefaultWeights(NodeMetric.UNIFORM_SUM_TO_ONE);
+	m.metric=function(n)
+	{
+		return n.isLeaf();
+	};
+	metrics.push(m);
+	
+	m=new NodeMetric('Percentage of Height');
+	m.setDefaultWeights(NodeMetric.ROOT_ONE_OTHERS_ZERO);
+	m.metric=function(n)
+	{
+		return n.getHeight()/n.getNumOfNodes();
+	};
+	metrics.push(m);
+	
+	m=new NodeMetric('Percentage of Width');
+	m.setDefaultWeights(NodeMetric.ROOT_ONE_OTHERS_ZERO);
+	m.metric=function(n)
+	{
+		return n.getWidth()/n.getNumOfNodes();
+	};
+	metrics.push(m);
+	
+	m=new NodeMetric('Percentage of Max Family Width');
+	m.setDefaultWeights(NodeMetric.ROOT_ONE_OTHERS_ZERO);
+	m.metric=function(n)
+	{
+		return n.getMaxFamilyWidth()/n.getNumOfNodes();
+	};
+	metrics.push(m);
+	
+	m=new NodeMetric('Percentage of ATR');
+	m.setDefaultWeights(NodeMetric.UNIFORM_SUM_TO_ONE);
+	m.metric=function(n)
+	{
+		return n.getRelation()=='ATR';
+	};
+	metrics.push(m);
+	
+	
+	m=new NodeMetric('Percentage of Verb Attributives');
+m.weight=function(n)
+{
+return 1/n.getRoot().getNumOfWords();
+};
+m.metric=function(n)
+{
+        if(n.getRelation()=='ATR'&& n.getPosTag()[0]=='v') return 1;
+        else return 0;
+};
+metrics.push(m);
+    
+    m=new NodeMetric('Percentage of Adjectival Attributives');
+m.weight=function(n)
+{
+return 1/n.getRoot().getNumOfWords();
+};
+m.metric=function(n)
+{
+        if(n.getRelation()=='ATR'&& n.getPosTag()[0]=='a') return 1;
+        else return 0;
+};
+metrics.push(m);
+    
+     m=new NodeMetric('Percentage of de Coordinates');
+m.weight=function(n)
+{
+return 1/n.getRoot().getNumOfWords();
+};
+m.metric=function(n)
+{   
+        if(n.getRelation()=='COORD'&& n.getLemma()=='δέ') return 1;
+        else return 0;
+};
+metrics.push(m);
+    
+     m=new NodeMetric('Percentage of Nodes under ATR');
+m.weight=function(n)
+{
+        if(n.getRelation()=='ATR')
+return 1;
+        else return 0;
+};
+m.metric=function(n)
+{   
+        return n.getNumOfNodes()/n.getRoot().getNumOfWords();
+};
+metrics.push(m);
+	
+//--------------------------------------------
+	
+	for(var wn=-1;wn<3;wn++)
+	{
+		var p=1;
+		for(var i=0;i<wn;i++)p*=2;
+		for(var k=0;k<p;k++)
+		{
+			m=new NodeMetric('Percentage of Leaves W'+wn+','+k);
+			m.setWaveletWeights(wn,k);
+			m.metric=function(n)
+			{
+				return n.isLeaf();
+			};
+			metrics.push(m);
+			
+			
+			m=new NodeMetric('Percentage of ATR W'+wn+','+k);
+			m.setWaveletWeights(wn,k);
+			m.metric=function(n)
+			{
+				return n.getRelation()=='ATR';
+			};
+			metrics.push(m);
+			
+			
+			m=new NodeMetric('Percentage of Verb Attributives W'+wn+','+k);
+			m.setWaveletWeights(wn,k);
+			m.metric=function(n)
+			{
+					if(n.getRelation()=='ATR'&& n.getPosTag()[0]=='v') return 1;
+					else return 0;
+			};
+			metrics.push(m);
+				
+			m=new NodeMetric('Percentage of Adjectival Attributives W'+wn+','+k);
+			m.setWaveletWeights(wn,k);
+			m.metric=function(n)
+			{
+					if(n.getRelation()=='ATR'&& n.getPosTag()[0]=='a') return 1;
+					else return 0;
+			};
+			metrics.push(m);
+				
+			m=new NodeMetric('Percentage of de Coordinates W'+wn+','+k);
+			m.setWaveletWeights(wn,k);
+			m.metric=function(n)
+			{   
+					if(n.getRelation()=='COORD'&& n.getLemma()=='δέ') return 1;
+					else return 0;
+			};
+			metrics.push(m);
+			
+		}
+	}
+	/*m=new NodeMetric('Percentage of ATR');
+	m.setDefaultWeights(NodeMetric.UNIFORM_SUM_TO_ONE);
+	m.metric=function(n)
+	{
+		return n.getRelation()=='ATR';
+	};
+	metrics.push(m);*/
+	
+	//t.treebank[41].getSentence(0).apply(metrics);
+
+	for(var i=0;i<metrics.length;i++)
+		output.println("{'"+metrics[i].name+"'}");
+	
+	t.apply(metrics,{progress:output.getProgress()});
+	
+	
+}
+
+
+
+var output=null;	
+function onload()
+{
+	console.log('test');
+	opn.setScreen("container");
+	opn.set(opn.getScreen().style,{backgroundColor:'transparent'});
+	var desktop=new VNApp();
+	desktop.load("6zmebmwnweqduyg5");
+	desktop.whenStarted().then(function(os){
+		os.getMenu().show();
+	/*var wm=vn.getWindowManager();
+	output=wm.createConsole({left:0,top:50,width:1000,height:800});
+	output.setTitle('metreex console 1.0');
+	var t=new TreebankCollection();
+	t.onload=function(){my_processing(t);};
+	t.load();*/
+	});
+}
+</script>
+</HEAD>
+<BODY onload="opn.run(onload);" style="margin:0px;">
+
+<div id="container" style="width:100%;top:0px;bottom:0px;position:absolute;">
+
+</div>
+</BODY>
+</HTML>
