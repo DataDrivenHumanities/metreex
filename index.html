@@ -7,13 +7,19 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 
+<style>
+	@-ms-viewport { width: 100vw ; min-zoom: 100% ; zoom: 100% ; }          @viewport { width: 100vw ; min-zoom: 100%; zoom: 100% ; }
+	@-ms-viewport { user-zoom: fixed ; min-zoom: 100% ; }                   @viewport { user-zoom: fixed ; min-zoom: 100% ; }
+
+</style>
+
 <title>metreex.org - Treebank Metric System</title>
 <link rel='shortcut icon' href='js/img/metreex_logo_256_alpha.png' />
 <link rel="icon" href="js/img/metreex_logo_256_alpha.png" /> 
 <link rel="stylesheet" type="text/css" href="style.css">
 
 <script type="text/javascript" src="https://research.dwi.ufl.edu/op.n/js/opn.js"></script>
-<script type="text/javascript" src="https://metreex.org/js/metreex-1.1.js"></script>
+<script type="text/javascript" src="/js/metreex-1.2.js"></script>
 <script type="text/javascript">
 
 
@@ -275,30 +281,49 @@ metrics.push(m);
 	for(var i=0;i<metrics.length;i++)
 		output.println("{'"+metrics[i].name+"'}");
 	
-	t.apply(metrics,{progress:output.getProgress()});
+	t.apply(metrics,{output});
 	
 	
 }
 
 
 
-var output=null;	
+var output={
+	println:function(txt){console.log(txt)},
+	getProgress:function(){return opn.getProgress()}
+};	
 function onload()
 {
-	console.log('test');
-	opn.setScreen("container");
-	opn.set(opn.getScreen().style,{backgroundColor:'transparent'});
-	var desktop=new VNApp();
-	desktop.load("6zmebmwnweqduyg5");
-	desktop.whenStarted().then(function(os){
-		os.getMenu().show();
-	/*var wm=vn.getWindowManager();
-	output=wm.createConsole({left:0,top:50,width:1000,height:800});
-	output.setTitle('metreex console 1.0');
-	var t=new TreebankCollection();
-	t.onload=function(){my_processing(t);};
-	t.load();*/
-	});
+	new opn.App().load("w2o8tx3j2vjqzscp@research.dwi.ufl.edu/op.n").then((Assets)=>{
+				var os=new Assets.opnOS({parentDiv:opn.getScreen()});
+				var w=os.newWindow({title:"Metreex Demo"});
+				let div=document.createElement('div');
+				w.getContentDiv().appendChild(div);
+				opn.set(div.style,{
+					fontFamily:"Courier",
+					color:'white',
+					background:'black',
+					top:'0px',
+					bottom:'0px',
+					left:'0px',
+					right:'0px',
+					position:'absolute',
+					overflowY:'scroll'
+				});
+				div.innerHTML="Metreex Demo";
+				let div2=document.createElement('div');
+				div.appendChild(div2);
+
+				output.println=(txt)=>{
+					div2.innerHTML+=txt+"<br/>";
+				}
+
+				var t=new TreebankCollection();
+				t.onload=function(){my_processing(t);};
+				t.load();
+
+			});
+
 }
 </script>
 </HEAD>
